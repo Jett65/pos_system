@@ -38,3 +38,4 @@ go.work.sum
 # misc
 .DS_Store
 npm-debug.log
+/tmp
