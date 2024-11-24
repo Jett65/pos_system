@@ -11,17 +11,19 @@ import (
 	"github.com/google/uuid"
 )
 
-const createAisles = `-- name: CreateAisles :one
+const createAisle = `-- name: CreateAisle :one
 INSERT INTO aisles (id, name)
-VALUES (
-    encode(sha256(random()::text::bytea), hex), 
-    $1
-) 
+VALUES ($1, $2) 
 RETURNING id, name
 `
 
-func (q *Queries) CreateAisles(ctx context.Context, name string) (Aisle, error) {
-	row := q.db.QueryRowContext(ctx, createAisles, name)
+type CreateAisleParams struct {
+	ID   uuid.UUID
+	Name string
+}
+
+func (q *Queries) CreateAisle(ctx context.Context, arg CreateAisleParams) (Aisle, error) {
+	row := q.db.QueryRowContext(ctx, createAisle, arg.ID, arg.Name)
 	var i Aisle
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
@@ -37,12 +39,23 @@ func (q *Queries) DeleteAisles(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getAisles = `-- name: GetAisles :many
+const getAisle = `-- name: GetAisle :one
 SELECT id, name FROM aisles WHERE id=$1
 `
 
-func (q *Queries) GetAisles(ctx context.Context, id uuid.UUID) ([]Aisle, error) {
-	rows, err := q.db.QueryContext(ctx, getAisles, id)
+func (q *Queries) GetAisle(ctx context.Context, id uuid.UUID) (Aisle, error) {
+	row := q.db.QueryRowContext(ctx, getAisle, id)
+	var i Aisle
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
+const getAisles = `-- name: GetAisles :many
+SELECT id, name FROM aisles
+`
+
+func (q *Queries) GetAisles(ctx context.Context) ([]Aisle, error) {
+	rows, err := q.db.QueryContext(ctx, getAisles)
 	if err != nil {
 		return nil, err
 	}

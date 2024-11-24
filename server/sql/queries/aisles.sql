@@ -1,13 +1,13 @@
--- name: CreateAisles :one
+-- name: CreateAisle :one
 INSERT INTO aisles (id, name)
-VALUES (
-    encode(sha256(random()::text::bytea), hex), 
-    $1
-) 
+VALUES ($1, $2) 
 RETURNING *;
 
--- name: GetAisles :many
+-- name: GetAisle :one
 SELECT * FROM aisles WHERE id=$1;
+
+-- name: GetAisles :many 
+SELECT * FROM aisles;
 
 -- name: DeleteAisles :exec
 DELETE FROM aisles

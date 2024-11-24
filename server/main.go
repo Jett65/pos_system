@@ -63,6 +63,10 @@ func main() {
 	v1Router.Get("/err", handlerErr)
 
 	// Routes
+    v1Router.Post("/aisles", apiCfg.handlerCreateAisle)
+    v1Router.Get("/aisles", apiCfg.handlerGetAisles)
+    v1Router.Get("/aisle/{aisleID}", apiCfg.handlerGetAisle)    
+    v1Router.Delete("/aisle/{aisleID}", apiCfg.handlerDeleteAisle)
 
 	router.Mount("/v1", v1Router)
 
